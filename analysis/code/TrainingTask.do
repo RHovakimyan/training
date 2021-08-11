@@ -30,7 +30,7 @@ foreach pkg in estout esttab{
 
 ** Declare global (Note: change this to your local path if it differs)
 if "`c(os)'" == "MacOSX" global github = "/Users/`c(username)'/Documents/GitHub/training"
-else global github = "C:/Users/`c(username)'/Documents/GitHub/training"
+else global github = "C:/Users/`c(username)'/Documents/training"
 
 ** Load data
 sysuse auto, clear // use example dataset that comes with Stata
@@ -47,7 +47,8 @@ eststo spec1
 estadd local typefe "No" // note whether car type fixed effects are included
 
 ** Run a regression of car weight on length, with car type fixed effects
-reg weight length i.foreign, r
+egen brand = group(make)
+reg weight length i.brand, r
 eststo spec2
 estadd local typefe "Yes"
 
@@ -56,5 +57,5 @@ esttab spec2 spec1 using "$github/analysis/output/car_weight_regs.tex", ///
 	replace se nonote numbers b(%8.2f) se(%8.2f) ///
 	keep(length) nomtitles star(* 0.10 ** 0.05 *** 0.01) ///
 	varlabels(length "Car length (inches)") ///
-	stats(typefe r2 N, l("Car type fixed effects" "\$R^{2}$" "Observations") ///
+	stats(typefe r2 N, l("Car make fixed effects" "\$R^{2}$" "Observations") ///
 	fmt(%8.0fc %8.2fc %8.0fc))
